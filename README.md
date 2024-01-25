@@ -1,1 +1,1 @@
-aaaaa
+It's my final project for Workshop class in my first university semester. It includes some researches about Vim, Memory profiling, and GNU/Linux bash scripting. I wrote these researches in pdf using LaTeX and also added .tex file to this repository.
