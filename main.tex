@@ -1,6 +1,21 @@
 \documentclass[titlepage]{article}
 
 \usepackage{fancyhdr}
+\usepackage{listings}
+
+
+\lstset{
+	language=Java,
+	aboveskip=3mm,
+	belowskip=3mm,
+	showstringspaces=false,
+	columns=flexible,
+	basicstyle={\small\ttfamily},
+	numbers=none,
+	breaklines=true,
+	breakatwhitespace=true,
+	tabsize=3
+}
 
 \title{Final project of Workshop}
 \author{Sepehr Narimani 402522139}
@@ -9,13 +24,122 @@
 \begin{document}
 	\maketitle
 	\pagestyle{fancy}
-	\fancyhead[R]{Git and GitHub}
-	
+	\fancyhead[L]{}
 	\section{Git and GitHub}
 	\subsection{Repository Initialization and Commits}
 	At first, I created a new folder in my computer using mkdir and then used git init command. I added README.md file and committed it. then I made 2 repositories to  add main.yml file, after adding that file, pasted your prepared file in my main.yml file and then committed it. I created a new repository in my github account and then used git remote add and then git push commands to push my repository in github.
 	\subsection{ GitHub Actions for LaTeX Compilation}
 	At first, I used your prepared yml file and added it to my repository, then after adding my .tex file to my repository and after committing it, I used "git tag v0.1.0" and pushed this tag to my repository. I saw my commit in Actions part in my repository in github.
+	\section{Exploration Tasks}
+	\subsection{Vim Advanced Features}
+	\begin{enumerate}
+	\item \textbf{Work with multiple files:}
+	
+	When working on a project, I often find myself using multiple files. Fortunately, Vim allows you to have several files open in different tabs. To initiate this behavior, issue the following command (from command mode):
+	\begin{lstlisting}
+		:tabe <filename>
+	\end{lstlisting}
+	This command enables tab expansion mode to make it easy to find files. Also, history is enabled and can be accessed by hitting the Up arrow.
+	
+	To switch between tabs, use:\\
+	gt — Switch to the tab on the right\\
+	gT — Switch to the tab on the left
+	\item \textbf{Switch case:}\\Most power users know the 
+	\textbf{\~} command to switch a single character's case, but this can also be expanded using Vim movement commands. For example, if you want to switch the word to the right of the cursor to upper case, enter:
+	\begin{lstlisting}
+		gUw
+	\end{lstlisting}
+	So, if the cursor is at the start of a line, this results in the following change:
+	\begin{lstlisting}
+		This is a line of text => THIS is a line of text
+	\end{lstlisting}
+	To change multiple words, put a number in front of the command, like so:
+	\begin{lstlisting}
+		gU2w
+	\end{lstlisting}
+	So now the change becomes this:
+	\begin{lstlisting}
+	This is a line of text => THIS IS a line of text
+	\end{lstlisting}
+	To change the whole line, try:
+	\begin{lstlisting}
+		gU$
+	\end{lstlisting}
+	\item \textbf{Increment or decrement numbers:}\\
+	Another frequent task is adjusting a code block or list in a text file to increment numbers. Instead of manually editing each line with something like \textbf{cW}, just position the cursor over the number and use one of the following:\\
+	\textbf{CTRL+A} to increment the number\\
+	\textbf{CTRL+X} to decrement the number
+	\end{enumerate}
+	\subsection{Memory profiling}
+	\subsubsection{Memory Leak}
+	A memory leak occurs when programmers create a memory in a heap and forget to delete it. The consequence of the memory leak is that it reduces the performance of the computer by reducing the amount of available memory. for example, when we want to use pointer to array in c after allocating it and do some works on that array we forget to free this allocated memory so it can cause memory leak. if we scrutinize more in reasons of memory leak there are 3 reasons:
+	\begin{enumerate}
+		\item When dynamically allocated memory is not freed up by calling free then it leads to memory leaks. Always make ensure that for every dynamic memory allocation using malloc or calloc, there is a corresponding free call
+		\item When track of pointers that references to the allocated memory is lost then it may happen that memory is not freed up. Hence keep the track of all pointers and make ensure that memory is freed.
+		\item When the program terminates abruptly and the allocated memory is not freed or if any part of code prevents the call of free then memory leaks may happen.
+	\end{enumerate}
+	\subsubsection{Memory profilers}
+	Valgrind is an instrumentation framework for building dynamic analysis tools. There are Valgrind tools that can automatically detect many memory management and threading bugs, and profile your programs in detail. You can also use Valgrind to build new tools.\\You can ask Valgrind to report on memory leaks. in this example we have a program named memoryLeak.c that we wrote it in C programming language, after compiling this file it seems that this is OK but if we run it under Valgrind using this command:
+	\begin{lstlisting}
+		$ valgrind ./memoryLeak
+	\end{lstlisting}
+	we see this:
+	\begin{lstlisting}
+		$ valgrind ./memoryLeak
+		==32251== Memcheck, a memory error detector
+		==32251== Copyright (C) 2002-2015, and GNU GPL'd, by Julian Seward et al.
+		==32251== Using Valgrind-3.11.0 and LibVEX; rerun with -h for copyright info
+		==32251== Command: ./memoryLeak
+		==32251== 
+		intArray[782]: 782
+		==32251== 
+		==32251== HEAP SUMMARY:
+		==32251==     in use at exit: 4,000 bytes in 1 blocks
+		==32251==   total heap usage: 2 allocs, 1 frees, 5,024 bytes allocated
+		==32251== 
+		==32251== LEAK SUMMARY:
+		==32251==    definitely lost: 4,000 bytes in 1 blocks
+		==32251==    indirectly lost: 0 bytes in 0 blocks
+		==32251==      possibly lost: 0 bytes in 0 blocks
+		==32251==    still reachable: 0 bytes in 0 blocks
+		==32251==         suppressed: 0 bytes in 0 blocks
+		==32251== Rerun with --leak-check=full to see details of leaked memory
+		==32251== 
+		==32251== For counts of detected and suppressed errors, rerun with: -v
+		==32251== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+		$
+	\end{lstlisting}
+	and now we see that there is a leak in program. At all, Valgrind categorizes leaks using these terms:\\
+	\begin{enumerate}
+		\item \textbf{definitely lost:} heap-allocated memory that was never freed to which the program no longer has a pointer. Valgrind knows that you once had the pointer, but have since lost track of it. This memory is definitely orphaned.
+		\item \textbf{indirectly lost:} heap-allocated memory that was never freed to which the only pointers to it also are lost. For example, if you orphan a linked list, the first node would be definitely lost, the subsequent nodes would be indirectly lost.
+		\item \textbf{possibly lost:} heap-allocated memory that was never freed to which valgrind cannot be sure whether there is a pointer or not.
+		\item \textbf{still reachable:} heap-allocated memory that was never freed to which the program still has a pointer at exit.
+	\end{enumerate}
+	\subsection{GNU/Linux Bash Scripting}
+	\subsubsection{fzf}
+	\begin{enumerate}
+		\item Fuzzy search, also known as fuzzy matching, has various interpretations, all of which revolve around the concept of approximate matching. It employs a fuzzy matching algorithm, which gives a list of results based on potential relevance even if the search argument phrases and spellings do not match exactly.
+		\item After installing fzf on my machine, I used ls | fzf command in my desktop and then it listed all my files in desktop, so then I was able to search between that files to find a file that I were looking for.
+	\end{enumerate}
+	\subsubsection{ Using fzf to find your favorite PDF}
+	\begin{enumerate}
+		\item \begin{lstlisting}
+			fd '.*\.pdf'
+		\end{lstlisting}
+		\item at first we should use this command:
+		\begin{lstlisting}
+			ls | fzf
+		\end{lstlisting}
+		and then type that pdf name to open.
+	\end{enumerate}
+	\subsubsection{Opening the file using Zathura}
+	With using this command:
+	\begin{lstlisting}
+		zathura $(fzf)
+	\end{lstlisting}
+	and then write the pdf name you want,you're able to open pdf.
+	
 	
 	
 \end{document}
